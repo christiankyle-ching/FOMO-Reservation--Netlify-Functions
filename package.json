@@ -1,0 +1,27 @@
+{
+  "name": "proto-gringo-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev:external": "npm-run-all -p dev:express dev:lt",
+    "dev:express": "node --inspect index.js",
+    "dev:lt": "lt --port 3000 --subdomain gringo-test-backend",
+    "dev": "node --inspect index.js",
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "firebase": "^8.3.0",
+    "firebase-admin": "^9.5.0",
+    "node-fetch": "^2.6.1"
+  },
+  "devDependencies": {
+    "npm-run-all": "^4.1.5"
+  }
+}
