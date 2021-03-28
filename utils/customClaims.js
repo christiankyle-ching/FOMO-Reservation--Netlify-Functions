@@ -1,4 +1,4 @@
-const admin = require("./firebaseAdmin");
+const admin = require("./firebaseAdmin.js");
 
 const setSuperAdmin = async function (_email) {
   try {
