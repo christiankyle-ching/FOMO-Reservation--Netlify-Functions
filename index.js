@@ -3,6 +3,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const fetch = require("node-fetch");
+const serverless = require("serverless-http");
 
 // Firebase
 const admin = require("./firebaseAdmin");
@@ -282,4 +283,5 @@ function processPayment(body) {
 //#endregion
 
 // Start Server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+module.exports.handler = serverless(app);
