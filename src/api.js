@@ -6,8 +6,8 @@ const fetch = require("node-fetch");
 const serverless = require("serverless-http");
 
 // Firebase
-const admin = require("../firebaseAdmin");
-const customClaims = require("../customClaims");
+const admin = require("./firebaseAdmin.js");
+const customClaims = require("./customClaims.js");
 
 const _db = admin.firestore();
 const _dbSuperAdmin = _db.collection("PRIVATE_SUPER_ADMIN");
@@ -41,7 +41,7 @@ app.use(cors(corsOptions));
 //#region ENDPOINTS
 
 // GET Checkout URL
-router.post("/api/payment", async (req, res, next) => {
+router.post("/payment", async (req, res, next) => {
   if (
     !(
       req.body.uid &&
@@ -111,7 +111,7 @@ router.post("/api/payment", async (req, res, next) => {
 });
 
 // ADD Admin
-router.post("/api/admins/", async (req, res, next) => {
+router.post("/admins/", async (req, res, next) => {
   if (!(req.body.token && req.body.userEmail)) {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
@@ -160,7 +160,7 @@ router.post("/api/admins/", async (req, res, next) => {
 });
 
 // REMOVE Admin
-router.post("/api/admins/:uid/remove", async (req, res, next) => {
+router.post("/admins/:uid/remove", async (req, res, next) => {
   if (!req.body.token) {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
@@ -209,7 +209,7 @@ router.post("/api/admins/:uid/remove", async (req, res, next) => {
  * WEBHOOK: Paymongo source.chargeable
  * Webhooks should always end immediately and return no response
  */
-router.post("/api/hooks/paymongo", (req, res) => {
+router.post("/hooks/paymongo", (req, res) => {
   console.log("[RECEIVED] ", req.body);
 
   // Webhook Types
