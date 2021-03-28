@@ -4,11 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev:external": "npm-run-all -p dev:express dev:lt",
-    "dev:express": "node --inspect index.js",
-    "dev:lt": "lt --port 3000 --subdomain gringo-test-backend",
-    "dev": "node --inspect index.js",
-    "start": "node index.js"
+    "start": "./node_modules/.bin/netlify-lambda serve src",
+    "build": "./node_modules/.bin/netlify-lambda build src"
   },
   "keywords": [],
   "author": "",
@@ -19,6 +16,7 @@
     "express": "^4.17.1",
     "firebase": "^8.3.0",
     "firebase-admin": "^9.5.0",
+    "netlify-lambda": "^2.0.3",
     "node-fetch": "^2.6.1",
     "serverless-http": "^2.7.0"
   },

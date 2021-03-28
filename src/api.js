@@ -6,8 +6,8 @@ const fetch = require("node-fetch");
 const serverless = require("serverless-http");
 
 // Firebase
-const admin = require("./firebaseAdmin");
-const customClaims = require("./customClaims");
+const admin = require("../firebaseAdmin");
+const customClaims = require("../customClaims");
 
 const _db = admin.firestore();
 const _dbSuperAdmin = _db.collection("PRIVATE_SUPER_ADMIN");
@@ -15,7 +15,6 @@ const _dbAdmins = _dbSuperAdmin.doc("admins");
 const _dbOrders = _db.collection("PUBLIC_ORDERS");
 
 // Global Variables
-const PORT = process.env.PORT || 3000;
 const paymongoBaseUrl = "https://api.paymongo.com/v1";
 const webAppBaseUrl = process.env.WEB_BASE_URL;
 const publicKey = process.env.PAYMONGO_PUBLIC_KEY;
@@ -27,6 +26,7 @@ customClaims.setSuperAdmin(superAdminEmail);
 
 // Init
 const app = express();
+const router = express.Router();
 
 //#region MiddleWares
 const corsOptions = {
@@ -41,7 +41,7 @@ app.use(cors(corsOptions));
 //#region ENDPOINTS
 
 // GET Checkout URL
-app.post("/api/payment", async (req, res, next) => {
+router.post("/api/payment", async (req, res, next) => {
   if (
     !(
       req.body.uid &&
@@ -111,7 +111,7 @@ app.post("/api/payment", async (req, res, next) => {
 });
 
 // ADD Admin
-app.post("/api/admins/", async (req, res, next) => {
+router.post("/api/admins/", async (req, res, next) => {
   if (!(req.body.token && req.body.userEmail)) {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
@@ -160,7 +160,7 @@ app.post("/api/admins/", async (req, res, next) => {
 });
 
 // REMOVE Admin
-app.post("/api/admins/:uid/remove", async (req, res, next) => {
+router.post("/api/admins/:uid/remove", async (req, res, next) => {
   if (!req.body.token) {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
@@ -209,7 +209,7 @@ app.post("/api/admins/:uid/remove", async (req, res, next) => {
  * WEBHOOK: Paymongo source.chargeable
  * Webhooks should always end immediately and return no response
  */
-app.post("/api/hooks/paymongo", (req, res) => {
+router.post("/api/hooks/paymongo", (req, res) => {
   console.log("[RECEIVED] ", req.body);
 
   // Webhook Types
@@ -221,6 +221,13 @@ app.post("/api/hooks/paymongo", (req, res) => {
       break;
   }
 });
+
+/**
+ * Use router, append before the routes /.netlify/functions/api
+ * "functions": from netlify.toml
+ * "api": from src/api.js
+ */
+app.use("/.netlify/functions/api", router);
 
 function processPayment(body) {
   const _data = body.data;
@@ -282,6 +289,5 @@ function processPayment(body) {
 
 //#endregion
 
-// Start Server
-// app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// Serverless Lambda
 module.exports.handler = serverless(app);

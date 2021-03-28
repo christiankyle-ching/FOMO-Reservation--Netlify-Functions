@@ -1,6 +1,7 @@
+# Local Only Files
 node_modules
-
-*.http
-service_account.json
-
 .vs
+*.local.*
+
+# netlify-functions build
+functions
