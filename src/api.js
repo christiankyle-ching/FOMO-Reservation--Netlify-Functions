@@ -6,8 +6,8 @@ const fetch = require("node-fetch");
 const serverless = require("serverless-http");
 
 // Firebase
-const admin = require("./firebaseAdmin.js");
-const customClaims = require("./customClaims.js");
+const admin = require("../utils/firebaseAdmin.js");
+const customClaims = require("../utils/customClaims.js");
 
 const _db = admin.firestore();
 const _dbSuperAdmin = _db.collection("PRIVATE_SUPER_ADMIN");
@@ -225,7 +225,7 @@ router.post("/hooks/paymongo", (req, res) => {
 /**
  * Use router, append before the routes /.netlify/functions/api
  * "functions": from netlify.toml
- * "api": from src/api.js
+ * "api": from src/api.js. Built using `netlify-lambda build src`
  */
 app.use("/.netlify/functions/api", router);
 
