@@ -12,9 +12,8 @@
 
 1. Create Firebase Project.
 2. Enable Auth (Facebook & Email)
-3. Set Email and Password of Admin. Then, set custom claims for that user in REPL function.
-4. Follow Facebook Auth guide by creating a Facebook App for Developer. Use own Facebook based on Gmail created (or use client's Facebook). [Guide](https://firebase.google.com/docs/auth/web/facebook-login#before_you_begin). Get App ID and Secret, use it in Firebase Console.
-5. Deploy to Vercel. Set Environment Variables:
+3. Set Email and Password of Super Admin.
+4. Deploy to Netlify Functions. Set Environment Variables:
 
 ```
 FIREBASE_CLIENT_EMAIL (from Google Private Key JSON)
