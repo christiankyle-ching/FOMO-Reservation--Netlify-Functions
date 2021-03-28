@@ -21,6 +21,11 @@ const publicKey = process.env.PAYMONGO_PUBLIC_KEY;
 const privateKey = process.env.PAYMONGO_PRIVATE_KEY;
 const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
 
+// TEST:
+console.log("[Paymongo API URL]", paymongoBaseUrl);
+console.log("[Web App URL]", webAppBaseUrl);
+console.log("[SuperAdmin Email]", superAdminEmail);
+
 // Set a single Super Admin User
 customClaims.setSuperAdmin(superAdminEmail);
 
@@ -33,6 +38,9 @@ const corsOptions = {
   origin: [webAppBaseUrl],
   methods: ["GET", "POST"],
 };
+
+// TEST:
+console.log("[CORS Options]", corsOptions);
 
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
