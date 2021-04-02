@@ -1,7 +1,9 @@
 # Local Only Files
 node_modules
 .vs
-*.local.*
+
+*.local*
+.env*
 
 # netlify-functions build
 functions

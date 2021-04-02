@@ -15,6 +15,10 @@ const _dbAdmins = _dbSuperAdmin.doc("admins");
 const _dbOrders = _db.collection("PUBLIC_ORDERS");
 
 // Global Variables
+if (process.env.NODE_ENV === "development") {
+  require("dotenv").config();
+}
+
 const paymongoBaseUrl = "https://api.paymongo.com/v1";
 const webAppBaseUrl = process.env.WEB_BASE_URL;
 const publicKey = process.env.PAYMONGO_PUBLIC_KEY;
