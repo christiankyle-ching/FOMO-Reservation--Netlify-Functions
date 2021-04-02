@@ -15,7 +15,8 @@ const _dbAdmins = _dbSuperAdmin.doc("admins");
 const _dbOrders = _db.collection("PUBLIC_ORDERS");
 
 // Global Variables
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV_LOCAL === "development") {
+  // Load local .env file in development
   require("dotenv").config();
 }
 
