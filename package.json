@@ -5,8 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "netlify-lambda build --config ./config/webpack.functions.js src",
-    "start": "netlify-lambda serve --config ./config/webpack.functions.js src",
-    "serve": "./node_modules/.bin/netlify-lambda serve src"
+    "start": "netlify-lambda serve --config ./config/webpack.functions.js src"
   },
   "keywords": [],
   "author": "",

@@ -2,6 +2,7 @@
 node_modules
 .vs
 
+# IMPORTANT: Do nor remove these rules. Stores all secrets locally.
 *.local*
 .env*
 
