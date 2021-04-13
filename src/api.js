@@ -6,7 +6,8 @@ const fetch = require("node-fetch");
 const serverless = require("serverless-http");
 
 // Firebase
-const admin = require("../utils/firebaseAdmin.js");
+require("../utils/firebaseAdmin.js"); // initializeApp
+const admin = require("firebase-admin");
 const customClaims = require("../utils/customClaims.js");
 
 const _db = admin.firestore();
@@ -26,7 +27,7 @@ const publicKey = process.env.PAYMONGO_PUBLIC_KEY;
 const privateKey = process.env.PAYMONGO_PRIVATE_KEY;
 const superAdminEmail = process.env.SUPER_ADMIN_EMAIL;
 
-// TEST:
+// Log
 console.log("[Paymongo API URL]", paymongoBaseUrl);
 console.log("[Web App URL]", webAppBaseUrl);
 console.log("[SuperAdmin Email]", superAdminEmail);
@@ -39,22 +40,28 @@ const app = express();
 const router = express.Router();
 
 //#region MiddleWares
+const {
+  authRequired,
+  superAdminAuthRequired,
+} = require("../utils/middlewares.js");
+
 const corsOptions = {
   origin: [webAppBaseUrl],
   methods: ["GET", "POST"],
 };
 
-// TEST:
-console.log("[CORS Options]", corsOptions);
+// For development only
+if (process.env.NODE_ENV_LOCAL === "development") corsOptions.origin.push("*");
 
 app.use(bodyParser.json());
 app.use(cors(corsOptions));
+
 //#endregion
 
 //#region ENDPOINTS
 
 // GET Checkout URL
-router.post("/payment", async (req, res, next) => {
+router.post("/payment", authRequired, async (req, res, next) => {
   if (
     !(
       req.body.uid &&
@@ -71,12 +78,6 @@ router.post("/payment", async (req, res, next) => {
   }
 
   console.log(req.body);
-
-  try {
-    await admin.auth().getUser(req.body.uid);
-  } catch (err) {
-    return res.status(401).send("Unauthorized");
-  }
 
   const url = `${paymongoBaseUrl}/sources`;
 
@@ -124,71 +125,49 @@ router.post("/payment", async (req, res, next) => {
 });
 
 // ADD Admin
-router.post("/admins/", async (req, res, next) => {
+router.post("/admins/", superAdminAuthRequired, async (req, res, next) => {
   if (!(req.body.token && req.body.userEmail)) {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
 
-  let claims = null;
-  let isSuperAdmin = false;
+  let adminToAdd = null;
 
   try {
-    claims = await admin.auth().verifyIdToken(req.body.token);
-    isSuperAdmin = !!claims.superAdmin;
+    adminToAdd = await admin.auth().getUserByEmail(req.body.userEmail);
+    //  If superAdmin, Add token
+    await customClaims.setAdmin(req.body.userEmail, true);
+  } catch (err) {
+    return res.status(400).send({ errors: ["user_not_found"] });
+  }
+
+  // Add admin in admins.adminList
+  try {
+    _dbAdmins.update({
+      adminList: admin.firestore.FieldValue.arrayUnion({
+        uid: adminToAdd.uid,
+        email: adminToAdd.email,
+      }),
+    });
   } catch (err) {
     return next(err);
   }
 
-  if (isSuperAdmin) {
-    let adminToAdd = null;
-
-    try {
-      adminToAdd = await admin.auth().getUserByEmail(req.body.userEmail);
-      //  If superAdmin, Add token
-      await customClaims.setAdmin(req.body.userEmail, true);
-    } catch (err) {
-      return res.status(400).send({ errors: ["user_not_found"] });
-    }
-
-    // Add admin in admins.adminList
-    try {
-      _dbAdmins.update({
-        adminList: admin.firestore.FieldValue.arrayUnion({
-          uid: adminToAdd.uid,
-          email: adminToAdd.email,
-        }),
-      });
-    } catch (err) {
-      next(err);
-    }
-
-    return res.status(200).send({
-      uid: adminToAdd.uid,
-      email: adminToAdd.email,
-      name: adminToAdd.displayName,
-    });
-  } else {
-    return res.status(401).send({ errors: ["unauthorized"] });
-  }
+  return res.status(200).send({
+    uid: adminToAdd.uid,
+    email: adminToAdd.email,
+    name: adminToAdd.displayName,
+  });
 });
 
 // REMOVE Admin
-router.post("/admins/:uid/remove", async (req, res, next) => {
-  if (!req.body.token) {
-    return res.status(400).send({ errors: ["incomplete_fields"] });
-  }
+router.post(
+  "/admins/:uid/remove",
+  superAdminAuthRequired,
+  async (req, res, next) => {
+    if (!req.body.token) {
+      return res.status(400).send({ errors: ["incomplete_fields"] });
+    }
 
-  let claims = null;
-  let isSuperAdmin = false;
-
-  try {
-    claims = await admin.auth().verifyIdToken(req.body.token);
-    isSuperAdmin = !!claims.superAdmin;
-  } catch (err) {
-    return next(err);
-  }
-
-  if (isSuperAdmin) {
     try {
       const adminToRemove = await admin.auth().getUser(req.params.uid);
       //  If superAdmin, Remove token
@@ -213,10 +192,8 @@ router.post("/admins/:uid/remove", async (req, res, next) => {
     } catch (err) {
       return next(err);
     }
-  } else {
-    return res.status(401).send({ errors: ["unauthorized"] });
   }
-});
+);
 
 /**
  * WEBHOOK: Paymongo source.chargeable
@@ -302,5 +279,5 @@ function processPayment(body) {
 
 //#endregion
 
-// Serverless Lambda
+// Serverless Netlify Lambda
 module.exports.handler = serverless(app);
