@@ -77,7 +77,7 @@ router.post("/payment", authRequired, async (req, res, next) => {
     return res.status(400).send({ errors: ["incomplete_fields"] });
   }
 
-  console.log(req.body);
+  console.log("[BODY] " + req.body);
 
   const url = `${paymongoBaseUrl}/sources`;
 

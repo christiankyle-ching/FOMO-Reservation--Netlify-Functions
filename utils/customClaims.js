@@ -5,7 +5,7 @@ const setSuperAdmin = async function (_email) {
     let user = null;
     user = await admin.auth().getUserByEmail(_email);
 
-    console.log(user);
+    console.log("[SETSUPERADMIN] " + user);
 
     if (user.customClaims && user.customClaims.superAdmin === true) {
       return;
@@ -26,7 +26,7 @@ const setAdmin = async function (_email, _enabled) {
     let user = null;
     user = await admin.auth().getUserByEmail(_email);
 
-    console.log(user);
+    console.log("[SETADMIN] " + user);
 
     return admin.auth().setCustomUserClaims(user.uid, {
       admin: _enabled,

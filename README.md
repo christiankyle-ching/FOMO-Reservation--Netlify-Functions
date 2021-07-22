@@ -1,12 +1,11 @@
-# Prototype - Gringo
+# Prototype
 
 ## Deployment Notes
 
 ### Accounts
 
-1. Create new Gmail for Gringo Web App only.
-2. Create Facebook account with that Gmail.
-3. Create Paymongo account with that Gmail.
+1. Create new Gmail.
+2. Create Paymongo account with that Gmail.
 
 ### App
 
